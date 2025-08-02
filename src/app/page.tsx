@@ -1,103 +1,232 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+import { Header } from "@/components/header";
+import { ProductCard } from "@/components/product-card";
+import { ProductFilters } from "@/components/product-filters";
+import { getProducts, getCategories } from "@/lib/api";
+import type { Product } from "@/types/product";
+import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button";
+import { Filter, X } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+export default function HomePage() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [minRating, setMinRating] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [productsData, categoriesData] = await Promise.all([
+          getProducts(),
+          getCategories(),
+        ]);
+        setProducts(productsData);
+        setCategories(categoriesData);
+        setFilteredProducts(productsData);
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    let filtered = products;
+
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((product) =>
+        selectedCategories.includes(product.category)
+      );
+    }
+
+    if (minRating > 0) {
+      filtered = filtered.filter((product) => product.rating.rate >= minRating);
+    }
+
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (product) =>
+          product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredProducts(filtered);
+  }, [products, selectedCategories, minRating, searchQuery]);
+
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    setMinRating(0);
+    setSearchQuery("");
+  };
+
+  const hasActiveFilters =
+    selectedCategories.length > 0 || minRating > 0 || searchQuery !== "";
+
+  const FiltersContent = () => (
+    <ProductFilters
+      categories={categories}
+      selectedCategories={selectedCategories}
+      onCategoriesChange={setSelectedCategories}
+      minRating={minRating}
+      onMinRatingChange={setMinRating}
+      onClearFilters={clearFilters}
+    />
+  );
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <div className="container mx-auto py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text">
+            Productos Destacados
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Descubre nuestra selección de productos de calidad
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className="flex gap-8">
+          <aside className="hidden lg:block w-80 flex-shrink-0">
+            <div className="sticky top-24">
+              <FiltersContent />
+            </div>
+          </aside>
+
+          <main className="flex-1">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <Sheet
+                  open={showMobileFilters}
+                  onOpenChange={setShowMobileFilters}
+                >
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="lg:hidden bg-transparent"
+                    >
+                      <Filter className="h-4 w-4 mr-2" />
+                      Filtros
+                      {hasActiveFilters && (
+                        <span className="ml-2 bg-primary text-primary-foreground rounded-full px-2 py-1 text-xs">
+                          {selectedCategories.length + (minRating > 0 ? 1 : 0)}
+                        </span>
+                      )}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80 overflow-y-auto">
+                    <div className="py-4">
+                      <FiltersContent />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+
+                <p className="text-sm text-muted-foreground">
+                  {filteredProducts.length} producto
+                  {filteredProducts.length !== 1 ? "s" : ""} encontrado
+                  {filteredProducts.length !== 1 ? "s" : ""}
+                </p>
+              </div>
+
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-primary hover:text-primary-foreground hover:bg-primary"
+                >
+                  <X className="h-4 w-4 mr-1" />
+                  Limpiar filtros
+                </Button>
+              )}
+            </div>
+
+            {hasActiveFilters && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {selectedCategories.map((category) => (
+                  <div
+                    key={category}
+                    className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                  >
+                    <span className="capitalize">{category}</span>
+                    <button
+                      onClick={() =>
+                        setSelectedCategories((prev) =>
+                          prev.filter((c) => c !== category)
+                        )
+                      }
+                      className="hover:bg-primary/20 rounded-full p-1"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+                {minRating > 0 && (
+                  <div className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">
+                    <span>{minRating}+ estrellas</span>
+                    <button
+                      onClick={() => setMinRating(0)}
+                      className="hover:bg-primary/20 rounded-full p-1"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="space-y-4">
+                    <Skeleton className="aspect-square w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+
+                {filteredProducts.length === 0 && (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">🔍</div>
+                    <h3 className="text-xl font-semibold mb-2">
+                      No se encontraron productos
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      Intenta ajustar los filtros o buscar con otros términos.
+                    </p>
+                    <Button onClick={clearFilters} variant="outline">
+                      Limpiar todos los filtros
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </main>
+        </div>
+      </div>
+    </>
   );
 }
