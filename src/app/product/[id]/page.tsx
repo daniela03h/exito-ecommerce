@@ -21,7 +21,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       <>
         <Header />
 
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto py-8 px-4">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             <div className="aspect-square overflow-hidden rounded-lg border">
               <Image

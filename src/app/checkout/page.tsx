@@ -55,7 +55,7 @@ export default function CheckoutPage() {
     return (
       <>
         <Header />
-        <div className="container mx-auto py-16 min-h-[calc(100vh_-_334px)]">
+        <div className="container mx-auto py-16 px-4 min-h-[calc(100vh_-_334px)]">
           <div className="max-w-md mx-auto text-center">
             <CheckCircle className="mx-auto h-16 w-16 text-success mb-4" />
             <h1 className="text-2xl font-bold mb-2 text-primary">¡Pedido confirmado!</h1>
@@ -78,7 +78,7 @@ export default function CheckoutPage() {
     <>
       <Header />
 
-      <div className="container mx-auto py-8">
+      <div className="container mx-auto py-8 px-4">
         <h1 className="text-3xl font-bold mb-8">Finalizar Compra</h1>
 
         <div className="grid lg:grid-cols-2 gap-8">

@@ -18,7 +18,7 @@ export function Header({ searchQuery, onSearchChange }: HeaderProps) {
   const itemCount = getItemCount()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-gradient-to-r from-secondary to-secondary/90 backdrop-blur supports-[backdrop-filter]:bg-secondary/60 shadow-lg">
+    <header className="sticky px-4 top-0 z-50 w-full border-b bg-gradient-to-r from-secondary to-secondary/90 backdrop-blur supports-[backdrop-filter]:bg-secondary/60 shadow-lg">
       <div className="container mx-auto flex h-16 items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link href="/" className="flex items-center space-x-2">

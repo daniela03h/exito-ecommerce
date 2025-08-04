@@ -34,18 +34,18 @@ export default function CartPage() {
     <>
       <Header />
 
-      <div className="container mx-auto py-8 min-h-[calc(100vh_-_334px)]">
+      <div className="container mx-auto py-8 px-4 min-h-[calc(100vh_-_334px)]">
         <h1 className="text-3xl font-bold mb-8">Carrito de Compras</h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 w-90 lg:w-auto">
             {items.map((item) => (
               <Card key={item.id}>
-                <CardContent className="p-6">
+                <CardContent className="p-6 w-auto">
                   <div className="flex gap-4">
-                    <div className="w-20 h-20 flex-shrink-0">
+                    <div className="h-20">
                       <Image
-                        src={item.image || "/placeholder.svg"}
+                        src={item.image || "../public/logo-exito.png"}
                         alt={item.title}
                         width={80}
                         height={80}
@@ -96,7 +96,7 @@ export default function CartPage() {
             ))}
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 w-90 lg:w-auto">
             <Card className="sticky top-24 border-2 border-primary/20 shadow-lg">
               <CardContent className="p-6">
                 <h2 className="text-xl font-bold mb-4">Resumen del pedido</h2>
