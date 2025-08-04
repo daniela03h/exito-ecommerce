@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/product-card";
 import { ProductFilters } from "@/components/product-filters";
 import { getProducts, getCategories } from "@/lib/api";
 import type { Product } from "@/types/product";
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -31,9 +31,9 @@ export default function HomePage() {
         setProducts(productsData);
         setCategories(categoriesData);
         setFilteredProducts(productsData);
-
       } catch (error) {
         console.error("Error fetching data:", error);
+        alert("Error al obtener los datos de los productos");
       } finally {
         setLoading(false);
       }
@@ -75,17 +75,6 @@ export default function HomePage() {
   const hasActiveFilters =
     selectedCategories.length > 0 || minRating > 0 || searchQuery !== "";
 
-  const FiltersContent = () => (
-    <ProductFilters
-      categories={categories}
-      selectedCategories={selectedCategories}
-      onCategoriesChange={setSelectedCategories}
-      minRating={minRating}
-      onMinRatingChange={setMinRating}
-      onClearFilters={clearFilters}
-    />
-  );
-
   return (
     <>
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
@@ -103,7 +92,14 @@ export default function HomePage() {
         <div className="flex gap-8">
           <aside className="hidden lg:block w-80 flex-shrink-0">
             <div className="sticky top-24">
-              <FiltersContent />
+              <ProductFilters
+                categories={categories}
+                selectedCategories={selectedCategories}
+                onCategoriesChange={setSelectedCategories}
+                minRating={minRating}
+                onMinRatingChange={setMinRating}
+                onClearFilters={clearFilters}
+              />
             </div>
           </aside>
 
@@ -128,9 +124,16 @@ export default function HomePage() {
                       )}
                     </Button>
                   </SheetTrigger>
-                  <SheetContent side="left" className="w-80 overflow-y-auto">
+                  <SheetContent side="left" className="w-full overflow-y-auto">
                     <div className="py-4">
-                      <FiltersContent />
+                      <ProductFilters
+                        categories={categories}
+                        selectedCategories={selectedCategories}
+                        onCategoriesChange={setSelectedCategories}
+                        minRating={minRating}
+                        onMinRatingChange={setMinRating}
+                        onClearFilters={clearFilters}
+                      />
                     </div>
                   </SheetContent>
                 </Sheet>
@@ -164,11 +167,14 @@ export default function HomePage() {
                   >
                     <span className="capitalize">{category}</span>
                     <button
-                      onClick={() =>
-                        setSelectedCategories((prev) =>
-                          prev.filter((c) => c !== category)
-                        )
-                      }
+                      onClick={() => {
+                        const nextSelectedCategories =
+                          selectedCategories.filter(
+                            (currentCategory) => currentCategory !== category
+                          );
+
+                        setSelectedCategories(nextSelectedCategories);
+                      }}
                       className="hover:bg-primary/20 rounded-full p-1"
                     >
                       <X className="h-3 w-3" />

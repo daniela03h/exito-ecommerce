@@ -1,20 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface ProductFiltersProps {
-  categories: string[]
-  selectedCategories: string[]
-  onCategoriesChange: (categories: string[]) => void
-  minRating: number
-  onMinRatingChange: (rating: number) => void
-  onClearFilters: () => void
+  categories: string[];
+  selectedCategories: string[];
+  onCategoriesChange: (categories: string[]) => void;
+  minRating: number;
+  onMinRatingChange: (rating: number) => void;
+  onClearFilters: () => void;
 }
 
 export function ProductFilters({
@@ -27,41 +31,49 @@ export function ProductFilters({
 }: ProductFiltersProps) {
   const [openSections, setOpenSections] = useState({
     categories: true,
-    price: true,
     rating: true,
-  })
+  });
 
   const toggleSection = (section: keyof typeof openSections) => {
-    setOpenSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }))
-  }
+    const nextOpenSections = {
+      ...openSections,
+      [section]: !openSections[section],
+    };
+
+    setOpenSections(nextOpenSections);
+  };
 
   const handleCategoryChange = (category: string, checked: boolean) => {
     if (checked) {
-      onCategoriesChange([...selectedCategories, category])
+      onCategoriesChange([...selectedCategories, category]);
     } else {
-      onCategoriesChange(selectedCategories.filter((c) => c !== category))
+      onCategoriesChange(selectedCategories.filter((c) => c !== category));
     }
-  }
+  };
 
   const ratingOptions = [
     { value: 0, label: "Todas las calificaciones" },
     { value: 4, label: "4 estrellas o más" },
     { value: 3, label: "3 estrellas o más" },
     { value: 2, label: "2 estrellas o más" },
-  ]
+  ];
 
   return (
     <div className="w-full space-y-4">
       <Card>
-        <Collapsible open={openSections.categories} onOpenChange={() => toggleSection("categories")}>
+        <Collapsible
+          open={openSections.categories}
+          onOpenChange={() => toggleSection("categories")}
+        >
           <CollapsibleTrigger asChild>
             <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Categoría</CardTitle>
-                {openSections.categories ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {openSections.categories ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </div>
             </CardHeader>
           </CollapsibleTrigger>
@@ -72,9 +84,14 @@ export function ProductFilters({
                   <Checkbox
                     id={category}
                     checked={selectedCategories.includes(category)}
-                    onCheckedChange={(checked) => handleCategoryChange(category, checked as boolean)}
+                    onCheckedChange={(checked) =>
+                      handleCategoryChange(category, checked as boolean)
+                    }
                   />
-                  <Label htmlFor={category} className="text-sm font-normal cursor-pointer capitalize">
+                  <Label
+                    htmlFor={category}
+                    className="text-sm font-normal cursor-pointer capitalize"
+                  >
                     {category}
                   </Label>
                 </div>
@@ -85,12 +102,19 @@ export function ProductFilters({
       </Card>
 
       <Card>
-        <Collapsible open={openSections.rating} onOpenChange={() => toggleSection("rating")}>
+        <Collapsible
+          open={openSections.rating}
+          onOpenChange={() => toggleSection("rating")}
+        >
           <CollapsibleTrigger asChild>
             <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Calificación</CardTitle>
-                {openSections.rating ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {openSections.rating ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
               </div>
             </CardHeader>
           </CollapsibleTrigger>
@@ -103,7 +127,10 @@ export function ProductFilters({
                     checked={minRating === option.value}
                     onCheckedChange={() => onMinRatingChange(option.value)}
                   />
-                  <Label htmlFor={`rating-${option.value}`} className="text-sm font-normal cursor-pointer">
+                  <Label
+                    htmlFor={`rating-${option.value}`}
+                    className="text-sm font-normal cursor-pointer"
+                  >
                     {option.label}
                   </Label>
                 </div>
@@ -122,7 +149,6 @@ export function ProductFilters({
           Limpiar filtros
         </Button>
       </div>
-
     </div>
-  )
+  );
 }
